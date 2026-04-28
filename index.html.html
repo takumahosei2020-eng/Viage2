@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>美age 化粧品メニュー表</title>
+  <style>
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      margin: 0;
+      background: #f8f5f7;
+      color: #333;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      padding: 20px;
+    }
+    h1 {text-align:center;font-size:32px;margin-bottom:25px;color:#b06a8d;}
+    .product {display:flex;align-items:center;justify-content:space-between;padding:15px;border-bottom:1px solid #eee;font-size:22px;gap:10px;}
+    .left {display:flex;align-items:center;gap:15px;flex:1;}
+    input[type="checkbox"] {transform:scale(1.8);}
+    .product-name {cursor:pointer;font-weight:bold;}
+    .price {font-weight:bold;min-width:120px;text-align:right;}
+    .delete-btn {background:#d66;font-size:14px;padding:8px 12px;border-radius:10px;}
+    .total {margin-top:30px;text-align:center;font-size:36px;font-weight:bold;color:#b06a8d;}
+    .btn-area {text-align:center;margin-top:25px;}
+    button {font-size:22px;padding:12px 25px;border:none;border-radius:15px;background:#b06a8d;color:white;cursor:pointer;margin:5px;}
+    .modal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:1000;}
+    .modal-content {background:white;padding:20px;border-radius:20px;width:80%;max-width:500px;text-align:center;}
+    .modal-content img {max-width:100%;border-radius:15px;margin-bottom:15px;}
+    .close {margin-top:15px;background:gray;}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>美age 化粧品メニュー表</h1>
+  <div id="productList"></div>
+  <div class="total">合計金額：¥<span id="totalPrice">0</span></div>
+  <div class="btn-area">
+    <button onclick="addProduct()">＋ 商品を追加</button>
+  </div>
+</div>
+
+<div class="modal" id="detailModal">
+  <div class="modal-content">
+    <h2 id="modalTitle"></h2>
+    <img id="modalImage" src="" alt="商品画像">
+    <p id="modalDesc"></p>
+    <button class="close" onclick="closeModal()">閉じる</button>
+  </div>
+</div>
+
+<script>
+let products = [
+ { name:"クレンジング", price:4800, desc:"毛穴汚れをしっかり落とす人気商品", img:"https://via.placeholder.com/400x250?text=クレンジング" },
+ { name:"美容液", price:9800, desc:"ハリと潤いを与える高保湿美容液", img:"https://via.placeholder.com/400x250?text=美容液" }
+];
+
+function renderProducts(){
+ const list=document.getElementById('productList');
+ list.innerHTML='';
+ products.forEach((p,index)=>{
+  list.innerHTML += `<div class="product">
+    <div class="left">
+      <input type="checkbox" onchange="updateTotal()" data-price="${p.price}">
+      <span class="product-name" onclick="showDetail(${index})">${p.name}</span>
+    </div>
+    <span class="price">¥${p.price.toLocaleString()}</span>
+    <button class="delete-btn" onclick="deleteProduct(${index})">削除</button>
+  </div>`;
+ });
+}
+
+function updateTotal(){
+ let total=0;
+ document.querySelectorAll('input[type="checkbox"]:checked').forEach(c=> total += Number(c.dataset.price));
+ document.getElementById('totalPrice').innerText = total.toLocaleString();
+}
+
+function addProduct(){
+ const name = prompt('商品名を入力してください');
+ if(!name) return;
+ const p = prompt('金額を入力してください');
+ if(!p) return;
+ const desc = prompt('商品の説明を入力してください') || '';
+ const img = prompt('画像URLを入力してください') || 'https://via.placeholder.com/400x250?text='+encodeURIComponent(name);
+ products.push({name:name, price:Number(p), desc:desc, img:img});
+ renderProducts();
+ alert('商品を追加しました');
+}
+
+function deleteProduct(index){
+ if(confirm(products[index].name+' を削除しますか？')){
+   products.splice(index,1);
+   renderProducts();
+   updateTotal();
+ }
+}
+
+function showDetail(index){
+ document.getElementById('modalTitle').innerText = products[index].name;
+ document.getElementById('modalImage').src = products[index].img;
+ document.getElementById('modalDesc').innerText = products[index].desc;
+ document.getElementById('detailModal').style.display='flex';
+}
+function closeModal(){document.getElementById('detailModal').style.display='none';}
+renderProducts();
+</script>
+</body>
+</html>
